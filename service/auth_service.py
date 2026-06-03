@@ -4,7 +4,7 @@ from config.database import db
 from models.user_model import User
 from models.audit_model import AuditLog
 
-VALID_ROLES = ["user", "owner", "group_admin", "admin"]
+VALID_ROLES = ["user", "owner", "group_admin"]
 
 def log_auth(user_id, action, details="", ip_address=""):
     db.session.add(AuditLog(user_id=user_id, action=action, details=details, ip_address=ip_address))
@@ -14,10 +14,7 @@ def register_user(data):
     role = data.get("role", "user")
     if role not in VALID_ROLES:
         role = "user"
-
-    # First registered user becomes admin automatically.
-    if User.query.count() == 0:
-        role = "admin"
+    # Security fix: never auto-create admin during public registration.
 
     user = User(
         username=data.get("username", "").strip(),

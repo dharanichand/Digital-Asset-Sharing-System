@@ -48,7 +48,7 @@ def register():
         return redirect("/register")
     user = register_user(data)
     send_welcome_email(user)
-    flash("Account created. First registered user automatically becomes admin.", "success")
+    flash("Account created successfully. Please login.", "success")
     return redirect("/login")
 
 @auth_bp.route("/login", methods=["POST"])
