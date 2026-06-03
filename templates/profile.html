@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile | AssetVault</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f3ec;--bg2:#ede6da;--panel:#fffaf1;--panel2:#f3eadc;--text:#1d1b16;--muted:#756d60;--line:rgba(29,27,22,.12);--accent:#c86b4a;--accent2:#345d52;--accent3:#d9a441;--danger:#b94a48;--good:#39755b;--shadow:0 24px 70px rgba(29,27,22,.12)}[data-theme=dark]{--bg:#171512;--bg2:#211d18;--panel:#242019;--panel2:#30291f;--text:#fbf4e7;--muted:#b9aa94;--line:rgba(251,244,231,.12);--accent:#e6845f;--accent2:#7bb5a4;--accent3:#f0bd55;--danger:#ff8b7f;--good:#87d7a7;--shadow:0 24px 80px rgba(0,0,0,.38)}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui;background:radial-gradient(circle at 18% 10%,rgba(200,107,74,.16),transparent 30%),radial-gradient(circle at 80% 12%,rgba(52,93,82,.18),transparent 25%),linear-gradient(135deg,var(--bg),var(--bg2));color:var(--text);min-height:100vh}.wrap{max-width:1120px;margin:0 auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:15px 18px;box-shadow:0 12px 30px rgba(0,0,0,.06);position:sticky;top:16px;z-index:4}.brand{font-family:'Space Grotesk';font-size:23px;font-weight:800;color:var(--text);text-decoration:none}.brand span{color:var(--accent)}.nav{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:15px;padding:10px 13px;text-decoration:none;font-weight:800;font-size:13px;cursor:pointer;transition:.2s}.btn:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 12px 26px rgba(0,0,0,.12)}.btn.primary{background:var(--text);color:var(--bg)}.danger{color:var(--danger)}.hero{margin:34px 0 20px}.eyebrow{color:var(--accent);font-weight:900;font-size:12px;text-transform:uppercase;letter-spacing:1.5px}.title{font-family:'Space Grotesk';font-size:52px;line-height:.95;letter-spacing:-2px;margin:8px 0}.sub{color:var(--muted)}.grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:22px;box-shadow:0 14px 34px rgba(0,0,0,.05);overflow:hidden}.panel:hover{border-color:var(--accent)}.card-main{text-align:center}.big-avatar{width:96px;height:96px;border-radius:26px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:grid;place-items:center;color:#211d18;font-family:'Space Grotesk';font-size:42px;font-weight:900;margin:6px auto 16px}.username{font-family:'Space Grotesk';font-size:28px;font-weight:800;letter-spacing:-.9px}.role{display:inline-flex;margin-top:12px;padding:8px 12px;border-radius:999px;background:rgba(123,181,164,.15);color:var(--accent2);font-size:12px;text-transform:uppercase;font-weight:900;letter-spacing:.8px}.info-list{display:grid;gap:10px;margin-top:22px;text-align:left}.info-row{padding:14px;border:1px solid var(--line);background:var(--panel2);border-radius:18px;min-width:0}.info-row small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:900;margin-bottom:4px}.info-row b{display:block;overflow-wrap:anywhere;font-size:14px}.tabs{display:grid;gap:18px}.panel h2{font-family:'Space Grotesk';font-size:25px;margin:0 0 5px}.panel p{margin:0 0 16px;color:var(--muted);font-size:14px}.field{margin-bottom:14px}.field label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:900;margin:0 0 8px}.field input{width:100%;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:16px;padding:13px 14px;font:600 14px Inter;outline:0;transition:.2s}.field input:focus{border-color:var(--accent);box-shadow:0 0 0 5px rgba(200,107,74,.14)}.msg{padding:13px 15px;border-radius:16px;margin-bottom:14px;font-weight:800;font-size:13px}.msg.success{background:rgba(57,117,91,.14);color:var(--good);border:1px solid rgba(57,117,91,.22)}.msg.error{background:rgba(185,74,72,.14);color:var(--danger);border:1px solid rgba(185,74,72,.22)}.note{font-size:12px;color:var(--muted);line-height:1.55;margin-top:10px}@media(max-width:850px){.grid{grid-template-columns:1fr}.top{position:static;align-items:flex-start;flex-direction:column}.title{font-size:38px}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+<a class="brand" href="/">Asset<span>Vault</span></a>
+<nav class="nav">
+<a class="btn" href="/dashboard">Dashboard</a>
+<a class="btn" href="/files">Library</a>
+{% if current_user.role == 'admin' %}<a class="btn" href="/admin">Admin</a>{% endif %}
+<button class="btn" onclick="toggleTheme()">◐ Theme</button>
+<a class="btn danger" href="/logout">Sign out</a>
+</nav>
+</header>
+
+<section class="hero">
+<div class="eyebrow">Account profile</div>
+<h1 class="title">Profile<br>settings.</h1>
+<div class="sub">View account details, update your username/email, and change your password securely.</div>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="msg {{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<main class="grid">
+<section class="panel card-main">
+<div class="big-avatar">{{ current_user.username[0]|upper }}</div>
+<div class="username">{{ current_user.username }}</div>
+<span class="role">{{ current_user.role }}</span>
+
+<div class="info-list">
+<div class="info-row"><small>Username</small><b>{{ current_user.username }}</b></div>
+<div class="info-row"><small>Email</small><b>{{ current_user.email }}</b></div>
+<div class="info-row"><small>Password</small><b>••••••••</b></div>
+<div class="info-row"><small>Group</small><b>{{ current_user.group_name or 'General' }}</b></div>
+<div class="info-row"><small>Last login</small><b>{% if current_user.last_login %}{{ current_user.last_login.strftime('%d %b %Y, %I:%M %p') }}{% else %}Not available{% endif %}</b></div>
+</div>
+<p class="note">For security, your real password is never shown. Use the form on the right to change it.</p>
+</section>
+
+<div class="tabs">
+<section class="panel">
+<h2>Edit profile</h2>
+<p>Update the basic details shown across the dashboard.</p>
+<form method="POST" action="/profile">
+<div class="field"><label>Username</label><input name="username" value="{{ current_user.username }}" required></div>
+<div class="field"><label>Email</label><input type="email" name="email" value="{{ current_user.email }}" required></div>
+<button class="btn primary" type="submit">Save profile</button>
+</form>
+</section>
+
+<section class="panel">
+<h2>Change password</h2>
+<p>Enter your current password and choose a new one.</p>
+<form method="POST" action="/change-password">
+<div class="field"><label>Current password</label><input type="password" name="current_password" required></div>
+<div class="field"><label>New password</label><input type="password" name="new_password" minlength="6" required></div>
+<div class="field"><label>Confirm new password</label><input type="password" name="confirm_password" minlength="6" required></div>
+<button class="btn primary" type="submit">Change password</button>
+</form>
+</section>
+</div>
+</main>
+</div>
+<script>
+function toggleTheme(){const r=document.documentElement,n=r.dataset.theme==='dark'?'light':'dark';r.dataset.theme=n;localStorage.setItem('theme',n)}
+document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark';
+</script>
+</body>
+</html>
