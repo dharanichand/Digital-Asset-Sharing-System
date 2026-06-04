@@ -1,40 +1,23 @@
-# Dynamic Email Setup for AssetVault
+# Render Email Setup for AssetVault
 
-This project now sends dynamic emails for:
+Add these variables in Render -> your Web Service -> Environment.
 
-- Welcome email after registration
-- Password reset email from `/forgot-password`
-- File upload confirmation
-- Permission granted / file shared notification
-- Public share link notification
+Required for Gmail SMTP:
 
-## Render Environment Variables
-
-Add these in Render → Your Web Service → Environment:
-
-```env
 MAIL_SERVER=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USE_TLS=true
-MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_gmail_app_password
-MAIL_DEFAULT_SENDER=your_email@gmail.com
-```
+MAIL_USE_TLS=True
+MAIL_USE_SSL=False
+MAIL_USERNAME=yourgmail@gmail.com
+MAIL_PASSWORD=your_16_character_google_app_password
+MAIL_DEFAULT_SENDER=yourgmail@gmail.com
 
-For Gmail, do **not** use your normal Gmail password. Use a Gmail App Password.
+Also keep:
 
-## Local Development
+SECRET_KEY=any_long_random_secret
+DATABASE_URL=your_render_postgresql_internal_url
 
-Create a `.env` file locally with the same variables. The app will still run if email variables are missing; it will skip emails and show a local reset link for forgot password testing.
-
-## Changed Files
-
-- `config/config.py`
-- `routes/auth_routes.py`
-- `routes/asset_routes.py`
-- `routes/permission_routes.py`
-- `service/email_service.py`
-- `templates/login.html`
-- `templates/forgot_password.html`
-- `templates/reset_password.html`
-- `requirements.txt`
+Important:
+- MAIL_PASSWORD must be a Google App Password, not your normal Gmail password.
+- Enable 2-Step Verification in Google Account before creating an App Password.
+- After adding/changing variables, click Save Changes and then Manual Deploy -> Clear build cache & deploy or Deploy latest commit.

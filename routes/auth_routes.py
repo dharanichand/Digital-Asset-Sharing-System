@@ -48,7 +48,7 @@ def register():
         return redirect("/register")
     user = register_user(data)
     send_welcome_email(user)
-    flash("Account created successfully. Please login.", "success")
+    flash("Account created successfully. Please log in.", "success")
     return redirect("/login")
 
 @auth_bp.route("/login", methods=["POST"])
@@ -87,8 +87,8 @@ def forgot_password():
         token = _make_password_reset_token(user)
         sent = send_password_reset_email(user, token)
         if not sent:
-            reset_link = f"/reset-password/{token}"
-            flash(f"Email is not configured yet. Local reset link: <a href='{reset_link}'>Reset password</a>", "success")
+            current_app.logger.error("Password reset email was not sent. Check MAIL_* environment variables in Render.")
+            flash("Password reset email could not be sent right now. Please check mail configuration.", "error")
             return redirect("/forgot-password")
 
     flash("If that email exists, a password reset link has been sent.", "success")

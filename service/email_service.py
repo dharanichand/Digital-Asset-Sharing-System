@@ -7,12 +7,6 @@ from flask import current_app, url_for
 
 
 def email_enabled() -> bool:
-    """Return True only when SMTP settings are configured.
-
-    The app must keep working locally even before you add email credentials.
-    When credentials are missing, email functions simply return False instead
-    of crashing the website.
-    """
     return bool(
         current_app.config.get("MAIL_USERNAME")
         and current_app.config.get("MAIL_PASSWORD")
@@ -20,23 +14,22 @@ def email_enabled() -> bool:
     )
 
 
+def _clean_app_password(password: str | None) -> str:
+    """Remove spaces accidentally copied from Google App Password display."""
+    return (password or "").replace(" ", "").strip()
+
+
 def send_email(to: str | Iterable[str], subject: str, body: str, html: Optional[str] = None) -> bool:
-    """Send one dynamic email using SMTP.
-
-    Required environment variables on Render:
-      MAIL_USERNAME
-      MAIL_PASSWORD
-
-    Optional environment variables:
-      MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS, MAIL_DEFAULT_SENDER
-    """
     if not email_enabled():
-        current_app.logger.info("Email skipped because SMTP environment variables are not configured.")
+        current_app.logger.error(
+            "Email disabled: MAIL_USERNAME, MAIL_PASSWORD, or MAIL_SERVER is missing."
+        )
         return False
 
     recipients = [to] if isinstance(to, str) else list(to)
-    recipients = [r for r in recipients if r]
+    recipients = [r.strip() for r in recipients if r and r.strip()]
     if not recipients:
+        current_app.logger.error("Email not sent: recipient list is empty.")
         return False
 
     sender = current_app.config.get("MAIL_DEFAULT_SENDER") or current_app.config["MAIL_USERNAME"]
@@ -52,16 +45,35 @@ def send_email(to: str | Iterable[str], subject: str, body: str, html: Optional[
     server = current_app.config.get("MAIL_SERVER", "smtp.gmail.com")
     port = int(current_app.config.get("MAIL_PORT", 587))
     use_tls = str(current_app.config.get("MAIL_USE_TLS", "true")).lower() in ["1", "true", "yes", "on"]
+    use_ssl = str(current_app.config.get("MAIL_USE_SSL", "false")).lower() in ["1", "true", "yes", "on"]
+
+    username = (current_app.config.get("MAIL_USERNAME") or "").strip()
+    password = _clean_app_password(current_app.config.get("MAIL_PASSWORD"))
 
     try:
-        with smtplib.SMTP(server, port, timeout=20) as smtp:
-            if use_tls:
+        smtp_class = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP
+        with smtp_class(server, port, timeout=20) as smtp:
+            smtp.ehlo()
+            if use_tls and not use_ssl:
                 smtp.starttls()
-            smtp.login(current_app.config["MAIL_USERNAME"], current_app.config["MAIL_PASSWORD"])
+                smtp.ehlo()
+            smtp.login(username, password)
             smtp.send_message(msg)
+
+        current_app.logger.info("Email sent successfully to %s", ", ".join(recipients))
         return True
-    except Exception as exc:
-        current_app.logger.exception("Email sending failed: %s", exc)
+
+    except smtplib.SMTPAuthenticationError:
+        current_app.logger.exception(
+            "Gmail rejected MAIL_USERNAME/MAIL_PASSWORD. "
+            "Create a NEW Google App Password, remove spaces, and update MAIL_PASSWORD."
+        )
+        return False
+
+    except Exception:
+        current_app.logger.exception(
+            "Email sending failed. Check MAIL_SERVER, MAIL_PORT, TLS/SSL settings, and internet access."
+        )
         return False
 
 
@@ -105,7 +117,11 @@ This link expires in 30 minutes. If you did not request this, you can ignore thi
     <h2>Password reset request</h2>
     <p>Hi {user.username},</p>
     <p>Click the button below to reset your password. This link expires in 30 minutes.</p>
-    <p><a href="{reset_url}" style="display:inline-block;padding:12px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;">Reset Password</a></p>
+    <p>
+      <a href="{reset_url}" style="display:inline-block;padding:12px 18px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;">
+        Reset Password
+      </a>
+    </p>
     <p>If the button does not work, copy this link:</p>
     <p>{reset_url}</p>
     """
@@ -169,6 +185,7 @@ Open your files page:
 def send_public_link_email(owner, asset) -> bool:
     if not asset.share_token:
         return False
+
     share_url = url_for("asset.public_share", token=asset.share_token, _external=True)
     subject = "Public sharing enabled"
     body = f"""Hi {owner.username},
